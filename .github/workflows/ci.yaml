@@ -61,6 +61,31 @@ jobs:
           mix deps.compile --warnings-as-errors
           mix dialyzer --plt
 
+  debug:
+    name: Dump debug output
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump GitHub Event Action
+        env:
+          GITHUB_EVENT_ACTION: ${{ toJson(github.event.action) }}
+        run: echo "$GITHUB_EVENT_ACTION"
+      - name: Dump GitHub Event Name
+        env:
+          GITHUB_EVENT_NAME: ${{ toJson(github.event_name) }}
+        run: echo "$GITHUB_EVENT_NAME"
+      - name: Dump GitHub Ref Name
+        env:
+          GITHUB_REF_NAME: ${{ toJson(github.ref_name) }}
+        run: echo "$GITHUB_REF_NAME"
+      - name: Dump DEPLOY_DEMO var
+        env:
+          DEPLOY_DEMO_VALUE: ${{ toJson(vars.DEPLOY_DEMO) }}
+        run: echo "$DEPLOY_DEMO_VALUE"
+
   tlint:
     name: Lint checks
     runs-on: ubuntu-20.04
@@ -327,7 +352,7 @@ jobs:
   build-demo-img:
     name: Build the docker image for the demo environment
     runs-on: ubuntu-20.04
-    if: vars.DEPLOY_DEMO == 'true' && (github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
+    if: (github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
     needs: [static-code-analysis, test]
     permissions:
       contents: read
@@ -366,7 +391,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.PAT }}
-          repository: ${{ github.repository_owner }}/web
+          repository: ${{ github.repository_owner }}/web-fork-test
           event-type: deploy-demo
 
   generate-docs:
