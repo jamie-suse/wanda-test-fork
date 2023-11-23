@@ -1,6 +1,7 @@
 version: "3.7"
 
 services:
+
   wanda:
     image: ghcr.io/trento-project/trento-wanda:rolling
     environment:
